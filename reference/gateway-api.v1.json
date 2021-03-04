@@ -368,31 +368,7 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "internalReference": {
                     "type": "number"
@@ -441,6 +417,12 @@
                   "properties": {
                     "status": {
                       "type": "object",
+                      "required": [
+                        "status",
+                        "reason",
+                        "message",
+                        "date"
+                      ],
                       "properties": {
                         "status": {
                           "type": "string",
@@ -458,13 +440,7 @@
                           "type": "string",
                           "minLength": 1
                         }
-                      },
-                      "required": [
-                        "status",
-                        "reason",
-                        "message",
-                        "date"
-                      ]
+                      }
                     },
                     "provider": {
                       "type": "string",
@@ -481,8 +457,7 @@
                     "cardTypes": {
                       "type": "array",
                       "items": {
-                        "required": [],
-                        "properties": {}
+                        "type": "object"
                       }
                     },
                     "displayInterest": {
@@ -503,12 +478,7 @@
                       "uniqueItems": true,
                       "minItems": 1,
                       "items": {
-                        "required": [
-                          "description",
-                          "code",
-                          "groupCode",
-                          "type"
-                        ],
+                        "type": "object",
                         "properties": {
                           "description": {
                             "type": "string",
@@ -529,12 +499,20 @@
                           "installments": {
                             "type": "array",
                             "items": {
-                              "required": [],
-                              "properties": {}
+                              "type": "object"
                             }
                           }
-                        }
+                        },
+                        "required": [
+                          "description",
+                          "code",
+                          "groupCode",
+                          "type"
+                        ]
                       }
+                    },
+                    "": {
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -632,54 +610,34 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "instrument": {
                     "type": "object",
+                    "required": [
+                      "card"
+                    ],
                     "properties": {
                       "card": {
                         "type": "object",
+                        "required": [
+                          "number"
+                        ],
                         "properties": {
                           "number": {
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "number"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "card"
-                    ]
+                    }
                   },
                   "payment": {
                     "type": "object",
+                    "required": [
+                      "reference",
+                      "amount"
+                    ],
                     "properties": {
                       "reference": {
                         "type": "string",
@@ -687,6 +645,10 @@
                       },
                       "amount": {
                         "type": "object",
+                        "required": [
+                          "total",
+                          "currency"
+                        ],
                         "properties": {
                           "total": {
                             "type": "number"
@@ -695,17 +657,9 @@
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "total",
-                          "currency"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "reference",
-                      "amount"
-                    ]
+                    }
                   }
                 },
                 "required": [
@@ -1039,21 +993,7 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string"
-                      },
-                      "tranKey": {
-                        "type": "string"
-                      },
-                      "nonce": {
-                        "type": "string"
-                      },
-                      "seed": {
-                        "type": "string"
-                      }
-                    }
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "locale": {
                     "type": "string"
@@ -1453,34 +1393,15 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "payer": {
                     "type": "object",
+                    "required": [
+                      "name",
+                      "surname",
+                      "email"
+                    ],
                     "properties": {
                       "name": {
                         "type": "string",
@@ -1494,18 +1415,22 @@
                         "type": "string",
                         "minLength": 1
                       }
-                    },
-                    "required": [
-                      "name",
-                      "surname",
-                      "email"
-                    ]
+                    }
                   },
                   "instrument": {
                     "type": "object",
+                    "required": [
+                      "card"
+                    ],
                     "properties": {
                       "card": {
                         "type": "object",
+                        "required": [
+                          "number",
+                          "expirationMonth",
+                          "expirationYear",
+                          "cvv"
+                        ],
                         "properties": {
                           "number": {
                             "type": "string",
@@ -1523,18 +1448,9 @@
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "number",
-                          "expirationMonth",
-                          "expirationYear",
-                          "cvv"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "card"
-                    ]
+                    }
                   },
                   "ipAddress": {
                     "type": "string",
@@ -1912,31 +1828,7 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "internalReference": {
                     "type": "number"
@@ -2508,31 +2400,7 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "reference": {
                     "type": "string",
@@ -2540,6 +2408,10 @@
                   },
                   "amount": {
                     "type": "object",
+                    "required": [
+                      "currency",
+                      "total"
+                    ],
                     "properties": {
                       "currency": {
                         "type": "string",
@@ -2548,11 +2420,7 @@
                       "total": {
                         "type": "number"
                       }
-                    },
-                    "required": [
-                      "currency",
-                      "total"
-                    ]
+                    }
                   }
                 },
                 "required": [
@@ -2614,49 +2482,35 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "instrument": {
                     "type": "object",
+                    "required": [
+                      "card",
+                      "credit"
+                    ],
                     "properties": {
                       "card": {
                         "type": "object",
+                        "required": [
+                          "number"
+                        ],
                         "properties": {
                           "number": {
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "number"
-                        ]
+                        }
                       },
                       "credit": {
                         "type": "object",
+                        "required": [
+                          "code",
+                          "type",
+                          "groupCode",
+                          "installment"
+                        ],
                         "properties": {
                           "code": {
                             "type": "number"
@@ -2672,22 +2526,16 @@
                           "installment": {
                             "type": "number"
                           }
-                        },
-                        "required": [
-                          "code",
-                          "type",
-                          "groupCode",
-                          "installment"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "card",
-                      "credit"
-                    ]
+                    }
                   },
                   "payment": {
                     "type": "object",
+                    "required": [
+                      "reference",
+                      "amount"
+                    ],
                     "properties": {
                       "reference": {
                         "type": "string",
@@ -2695,6 +2543,10 @@
                       },
                       "amount": {
                         "type": "object",
+                        "required": [
+                          "total",
+                          "currency"
+                        ],
                         "properties": {
                           "total": {
                             "type": "number"
@@ -2703,17 +2555,9 @@
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "total",
-                          "currency"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "reference",
-                      "amount"
-                    ]
+                    }
                   }
                 },
                 "required": [
@@ -2762,7 +2606,7 @@
       },
       "parameters": []
     },
-    "/generate": {
+    "/otp/generate": {
       "parameters": [],
       "post": {
         "summary": "Generation OTP  (only Ecuador)",
@@ -2838,54 +2682,34 @@
                 "type": "object",
                 "properties": {
                   "auth": {
-                    "type": "object",
-                    "properties": {
-                      "login": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "tranKey": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "nonce": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "seed": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "login",
-                      "tranKey",
-                      "nonce",
-                      "seed"
-                    ]
+                    "$ref": "#/components/schemas/Authentication"
                   },
                   "instrument": {
                     "type": "object",
+                    "required": [
+                      "card"
+                    ],
                     "properties": {
                       "card": {
                         "type": "object",
+                        "required": [
+                          "number"
+                        ],
                         "properties": {
                           "number": {
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "number"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "card"
-                    ]
+                    }
                   },
                   "payment": {
                     "type": "object",
+                    "required": [
+                      "reference",
+                      "amount"
+                    ],
                     "properties": {
                       "reference": {
                         "type": "string",
@@ -2893,6 +2717,10 @@
                       },
                       "amount": {
                         "type": "object",
+                        "required": [
+                          "total",
+                          "currency"
+                        ],
                         "properties": {
                           "total": {
                             "type": "number"
@@ -2901,17 +2729,9 @@
                             "type": "string",
                             "minLength": 1
                           }
-                        },
-                        "required": [
-                          "total",
-                          "currency"
-                        ]
+                        }
                       }
-                    },
-                    "required": [
-                      "reference",
-                      "amount"
-                    ]
+                    }
                   }
                 },
                 "required": [
@@ -3016,8 +2836,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {}
+                "type": "object"
               },
               "examples": {
                 "Ejemplo": {
@@ -3056,6 +2875,81 @@
     }
   },
   "components": {
-    "schemas": {}
+    "schemas": {
+      "Status": {
+        "title": "Status",
+        "type": "object",
+        "description": "",
+        "x-examples": {},
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "OK",
+              "FAILED",
+              "REJECTED",
+              "APPROVED"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "reason",
+          "message",
+          "date"
+        ]
+      },
+      "Authentication": {
+        "description": "Structure containing the authentication information generated according to site WSSE UsernameToken Profile 1.1\n\nAll requests to the web must be authenticated with Web Services Security UsernameToken Profile 1.1.\nhttps://www.oasis-open.org/committees/download.php/13392/wss-v1.1-spec-pr-UsernameTokenProfile-01.htm\n\nUsing PasswordDigest\n\n**PasswordDigest = Base64 ( SHA-256 ( nonce + seed + tranKey ) )**\n\n`The login and secretKey are supplied by PlacetoPay`\n\n`This structure must be sent in each request made to the service`\n\n `The seed cannot have a difference of more than 5 minutes.`\n \n\n**Troubleshooting**\n\nAuthentication failure response codes.\n\n| Codigo | Significado |\n|-----------|-------------|\n| 100 | No UsernameToken provided (Authorization Header Malformed) |\n| 101  | Login does not exists (Wrong login, or not the correct environment) |\n| 102  | TranKey hash does not match (Malformed or incorrect tranKey) |\n| 103  | Seed date older than 5 minutes |\n| 104  | Inactive site |\n| 105  | Expired site |\n| 106  | Expired credentials |\n| 107  | Bad UsernameToken definition (Not compliant WSSE header) |\n| 200  | Skipping SOAP authentication Header |\n| 10001  | Contact Support |\n\n\nOn the right side you can simulate the generation of the authentication required for each of the requests made to the payment gateway (webcheckout), this method receives a login and a trankey through a POST request, internally the processing is performed of the information to return a JSON structure that can be copied and pasted in the other requests within the auth object.\n\nIt should be clarified that this method is provided as an aid to generate the authentication structure of the requests and is not part of the webcheckout integration method\n\nurl reference authentication: https://placetopay.github.io/web-checkout-api-docs/?shell#authentication-ecuador\n",
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tranKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nonce": {
+            "type": "string",
+            "minLength": 1
+          },
+          "seed": {
+            "type": "string",
+            "minLength": 1,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "login",
+          "tranKey",
+          "nonce",
+          "seed"
+        ],
+        "title": "Authentication",
+        "x-examples": {
+          "example": {
+            "login": "usuarioprueba",
+            "tranKey": "dsRL5wIymrySr9TgsYtxWZEIb5/RtW1v3n3xLqQZKj4=",
+            "nonce": "MTIzNDU2Nzg=",
+            "seed": "2018-01-29T17:02:49-05:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {},
+    "responses": {}
   }
 }
