@@ -669,7 +669,7 @@
             }
           }
         },
-        "description": "Allows you to make a reversal, re-authorization, refund or cash out on an existing transaction.",
+        "description": "Allows you to make a reversal, re-authorization, refund or cash out on an existing transaction",
         "requestBody": {
           "content": {
             "application/json": {
