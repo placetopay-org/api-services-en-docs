@@ -41,7 +41,7 @@ You must first make a CHECKIN request to process a REAUTHORIZATION because:
 - The payment currency for REAUTHORIZATION cases is overwritten by the original CHECKIN session.
 - The data used in the “internalReference” and “authorization” of the request correspond to the data delivered in the CHECKIN response in the "preAuthorization” node.
 - It possible to perform n (several) REAUTHORIZATION operations, of course, all of them before the CHECKOUT operation.
--Reauthorizations should always have a value greater than 0.
+- Reauthorizations should always have a value greater than 0.
 
 
 Keep in mind that after this operation, the preauthorization process is still pending since it is waiting on the CHECKOUT operation.
