@@ -2,7 +2,6 @@
 
 The WebCheckout Placetopay API uses Web Services Security UsernameToken Profile 1.1 to authenticate all requests.
 
-
 Service authentication must be sent on the `auth` object, which must contain the following attributes:
 
 Values like `login` and `secretKey` are provided by Placetopay.
