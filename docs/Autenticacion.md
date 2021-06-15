@@ -14,7 +14,7 @@ Value | Description
  **nonce** | Random value for each request coded in Base64.
  **seed** | Current date, which is generated in ISO 8601 format.
 
- 
+
 ```json
 IMPORTANT NOTICE:
 
