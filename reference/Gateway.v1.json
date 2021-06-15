@@ -187,7 +187,7 @@
     },
     "/process": {
       "post": {
-        "summary": "Procesamiento de transacción",
+        "summary": "Transaction Processing",
         "operationId": "post-gateway-process",
         "description": "This service lets you charge the user's card. The instrument parameters are variable; if the type of credit or OTP are not requested, you don't need to send these variables; payer is always required; buyer is optional but recommended.",
         "requestBody": {
@@ -1484,7 +1484,7 @@
     "/report": {
       "parameters": [],
       "post": {
-        "summary": "Solicitar un reporte",
+        "summary": "Request a Report",
         "operationId": "post-report",
         "responses": {
           "200": {
@@ -1600,11 +1600,11 @@
     },
     "/report/obtain": {
       "post": {
-        "summary": "Obtener un reporte previamente solicitado",
+        "summary": "Obtaining a Previously Requested Report",
         "operationId": "post-report-obtain",
         "responses": {
           "200": {
-            "description": "OK\n\nUna vez se tiene el reporte retorna la información, el cúal es un archivo separado por comas con los siguientes encabezados\n\n```\nid\ndate\ntransaction_date\nreference\ncurrency_code\namount\ntax\npayment_method\ninternal_reference\nstatus\nreason\nmerchant\nterminal\nauthorization\nrefunded\ninstallments\nlast_digits\nbank_currency\nbank_factor\nbank_amount\nissuer_name\npayer_document\npayer_first_name\npayer_last_name\npayer_email\nip_address\nbatch_number\nline_number\n```",
+            "description": "OK\n\nOnce the report is obtained, the information is returned on an individual comma-separated file with the following headers\n\n```\nid\ndate\ntransaction_date\nreference\ncurrency_code\namount\ntax\npayment_method\ninternal_reference\nstatus\nreason\nmerchant\nterminal\nauthorization\nrefunded\ninstallments\nlast_digits\nbank_currency\nbank_factor\nbank_amount\nissuer_name\npayer_document\npayer_first_name\npayer_last_name\npayer_email\nip_address\nbatch_number\nline_number\n```",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1661,7 +1661,7 @@
           },
           "description": ""
         },
-        "description": "Permite obtener un reporte previamente generado",
+        "description": "Lets you obtain a previously generated report.",
         "parameters": [
           {
             "schema": {
