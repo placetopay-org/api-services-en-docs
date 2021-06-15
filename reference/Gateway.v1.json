@@ -116,7 +116,7 @@
     "/information": {
       "parameters": [],
       "post": {
-        "summary": "",
+        "summary": "Information Request",
         "operationId": "post-information",
         "responses": {
           "200": {
