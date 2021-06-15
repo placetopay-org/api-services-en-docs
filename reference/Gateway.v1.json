@@ -540,7 +540,7 @@
     },
     "/transaction": {
       "post": {
-        "summary": "Operaciones sobre una transacción",
+        "summary": "Operations on a transaction",
         "operationId": "post-gateway-transaction",
         "responses": {
           "200": {
@@ -669,7 +669,7 @@
             }
           }
         },
-        "description": "Permite realizar un reverso, re-autorización, reembolso o cash out sobre una transacción existente",
+        "description": "Allows you to make a reversal, re-authorization, refund or cash out on an existing transaction.",
         "requestBody": {
           "content": {
             "application/json": {
