@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "type": "item",
+      "title": "Authentication",
+      "uri": "docs/Autenticacion.md"
+    },
+    {
+      "type": "item",
+      "title": "Integration Flow",
+      "uri": "docs/Flujo-de-integracion.md"
+    },
+     {
+      "type": "item",
+      "title": "API",
+      "uri": "Gateway.v1.json"
+    },
+    {
+      "type": "item",
+      "title": "Payment Methods",
+      "uri": "docs/Metodos-de-pago.md"
+    },
+    {
+      "type": "item",
+      "title": "Types of Documents",
+      "uri": "docs/Tipos-de-documento.md"
+    },
+    {
+      "type": "item",
+      "title": "Taxes",
+      "uri": "docs/Tipos-de-impuestos.md"
+    },
+    {
+      "type": "item",
+      "title": "Transaction Types",
+      "uri": "docs/Tipos-de-transacciones.md"
+    }
+  ]
+}

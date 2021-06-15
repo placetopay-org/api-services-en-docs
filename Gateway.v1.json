@@ -1,0 +1,2044 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Gateway",
+    "version": "1.0",
+    "license": {
+      "name": "Privative"
+    },
+    "description": "This web service and its architecture allow any application to connect to Placetopay in order to process cards, regardless of the app development language.\n\nTo use the web service, you should use a programming language that can communicate with a REST service.\n\nThe integration method considers the basic operations to process card-not-present transactions; that is, types of credit, interests, generating OTPs, authorizations, and reversals.\n\nBelow we describe each use and the data required in the frame for each case. The response for each operation is unified into a single resulting frame type.\n\nThe default language for the responses is Spanish. To change the default language, the locale parameter must be sent in the requests.\n\n### How does it work?\n\nHow does it work?\n\n1. Once the user card number is captured, it is sent via request to the informationRequest service.The service response is analyzed to provide the following options:\n* If the response contains \"credit\" types, they should be shown to the user to let them select which one to use.\n* If the response contains the \"displayInterest\" parameter set to true, and after a type of credit is selected, the interestCalculation service should be called, and the user should be shown the response; this should be done every time the user changes the type of credit.\n* Si la respuesta trae el parámetro “requireOtp” en true, se debe hacer el consumo al servicio de generación de OTP (otpGeneration) \n\n`Este mecanismo sólo debe ser usado por aquellos clientes \nplataforma que requieren capturar la información del tarjetahabiente incluyendo los datos sensibles`.\n\nLa integración se recomienda únicamente en los casos que no sea factible que el usuario realice la transacción ingresando los datos sensibles en PlacetoPay o en donde se requiere un control particular de la operación.\n\n Algunos ejemplos son:\n\n* Cobros recurrentes desde una base de datos propietaria.\n* Integración con un sistema de audiorespuesta.\n* Múltiples transacciones a diferentes recaudadores con la misma información del tarjetahabiente.\n* Interfaz móvil propietaria, no basada en HTML.\n* Integración con sistemas cuya entrada de los datos sensibles no la realice directamente el tarjetahabiente.\n\n### ¿Qué obligaciones tengo cuando uso esta integración? \n\nTenga en cuenta que al usar este tipo de integración, usted está suministrando todos los datos del comprador incluyendo los datos sensibles de la tarjeta, este solo hecho requiere que la captura de la información sea por un mecanismo seguro que no ponga en peligro los datos del tarjetahabiente.  Si la información la captura por una página Web, el punto donde se capturan estos datos debe estar sobre protocolo seguro HTTPS usando certificados de seguridad expedidos por una entidad certificadora acreditada.\n\nSi la captura la realiza por un Call Center, quien obtiene los datos sensibles debe ser un mecanismo de IVR `Interactive Voice Response` o audiorespuesta; esto implicaría un rompimiento en el proceso entre el proceso que realiza el operador con su CRM y el IVR quien captura los datos sensibles.  Finalmente el CRM consolida los dos conjuntos de datos y los remite a Place to Pay.\n\nSi la captura proviene de una base de datos de tarjetas previamente inscritas, asegúrese que esta información está encriptada por un mecanismo seguro de encriptación como AES o 3DES, desencripte solo en el momento en que construye la trama a ser enviada a Place to Pay. Place to Pay tiene servicios de tokenización que pueden ser usados.\n\nTenga en cuenta que como regla general usted no debe almacenar el número de tarjeta, fecha de vencimiento y CVV2.  Estos solo pueden tener persistencia durante la solicitud de la autorización, una vez procesada no deben ser almacenados.\n\nComo cualquier proceso de integración, este requerirá una certificación del personal de soporte de Place to Pay para revisar temas de funcionamiento, mejores prácticas y usabilidad.\n\n### Servicios\n\nTodos los consumos se realizan a la URL base, que será proporcionada por el área de operaciones y se le adiciona a dicha URL el endpoint del servicio a consumir.\n\nPor ejemplo si la URL base fuese https://placetopay.com para consumir el servicio se solicitud de información se realiza un POST con los datos del ejemplo a la URL https://placetopay.com/gateway/information.\n\n### Información adicional\n\nNúmeros de tarjeta de pruebas\n\nEs importante definir que estas tarjetas solo tienen dicho comportamiento en el ambiente de pruebas\n\n\n| Franquicia | Número | Comportamiento |\n|-----------|------|-------------|\n| VISA | 4007000000027 | Aprueba |\n| VISA | 41111111111111111 | Aprueba |\n| VISA | 4212121212121214  | Pendiente |\n| VISA | 4005580000000040  | Rechazada |\n| MASTERCARD | 5424000000000015 | Aprueba |\n| AMERICAN EXPRESS | 370000000000002 | Aprueba |\n| DINERS  | 36018623456787 | Aprueba |\n| CREDENCIAL | 5406251000000008 | Aprueba |\n",
+    "contact": {
+      "name": "Diego Calle",
+      "email": "desarrollo@evertecinc.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://test.placetopay.com/rest/gateway",
+      "description": "Pruebas Colombia"
+    },
+    {
+      "url": "https://test.placetopay.ec/rest/gateway",
+      "description": "Pruebas Ecuador"
+    }
+  ],
+  "paths": {
+    "/query": {
+      "post": {
+        "summary": "Transaction Query",
+        "operationId": "post-rest-gateway-query",
+        "description": "Allows users to perform transaction queries.",
+        "tags": [
+          "Consulta de una transaccion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "internalReference": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "internalReference": {
+                      "type": "string"
+                    },
+                    "reference": {
+                      "type": "string"
+                    },
+                    "paymentMethod": {
+                      "type": "string"
+                    },
+                    "franchise": {
+                      "type": "string"
+                    },
+                    "franchiseName": {
+                      "type": "string"
+                    },
+                    "issuerName": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "$ref": "#/components/schemas/Amount"
+                    },
+                    "conversion": {
+                      "$ref": "#/components/schemas/AmountConversion"
+                    },
+                    "authorization": {
+                      "type": "string"
+                    },
+                    "receipt": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "refunded": {
+                      "type": "string"
+                    },
+                    "lastDigits": {
+                      "type": "string"
+                    },
+                    "additional": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/information": {
+      "post": {
+        "summary": "Information request",
+        "operationId": "post-rest-gateway-information",
+        "description": "This service provides information about the user's card that will be processed, such as which services will be used for it and the types of credit available for it, if applicable. If there are no types of credits, an empty array is returned, and if there are, each type of credit should be iterated with the installments in the array.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "instrument": {
+                    "$ref": "#/components/schemas/Instrument"
+                  },
+                  "payment": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "cardTypes": {
+                      "type": "string"
+                    },
+                    "requiereCvv2": {
+                      "type": "boolean"
+                    },
+                    "requiereOtp": {
+                      "type": "boolean"
+                    },
+                    "threeDS": {
+                      "type": "string"
+                    },
+                    "credits": {
+                      "$ref": "#/components/schemas/Credit"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Obtener información según la tarjeta"
+        ]
+      },
+      "parameters": []
+    },
+    "/process": {
+      "post": {
+        "summary": "Procesamiento de transacción",
+        "operationId": "post-gateway-process",
+        "description": "This service lets you charge the user's card. The instrument parameters are variable; if the type of credit or OTP are not requested, you don't need to send these variables; payer is always required; buyer is optional but recommended.",
+        "tags": [
+          "Procesamiento de transaccion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string"
+                  },
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "payment": {
+                    "$ref": "#/components/schemas/Payment"
+                  },
+                  "instrument": {
+                    "$ref": "#/components/schemas/Instrument"
+                  },
+                  "payer": {
+                    "$ref": "#/components/schemas/Person"
+                  },
+                  "buyer": {
+                    "$ref": "#/components/schemas/Person"
+                  },
+                  "ipAddress": {
+                    "type": "string"
+                  },
+                  "userAgent": {
+                    "type": "string"
+                  },
+                  "additional": {
+                    "type": "object",
+                    "description": ""
+                  }
+                }
+              },
+              "examples": {
+                "simple": {
+                  "value": {
+                    "payer": {
+                      "name": "Ms. Nelle Beahan DVM",
+                      "surname": "Spencer",
+                      "email": "gsteuber@kling.com",
+                      "documentType": "CC",
+                      "document": "3154383838",
+                      "mobile": "3006108300"
+                    },
+                    "payment": {
+                      "reference": "TEST_20210526_141005",
+                      "description": "Cum vitae et consequatur quas adipisci ut rem.",
+                      "amount": {
+                        "currency": "COP",
+                        "total": 32030
+                      }
+                    },
+                    "instrument": {
+                      "card": {
+                        "number": "36545400000008",
+                        "expiration": "12/20",
+                        "cvv": "123",
+                        "installments": 2
+                      }
+                    },
+                    "ipAddress": "190.85.90.130",
+                    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+                  }
+                },
+                "full": {
+                  "value": {
+                    "auth": {
+                      "login": "c4ca4238a0b923820dcc509a6f75849b",
+                      "tranKey": "cgqVhiaKSUSJmYQsXMsBqpfjz155nyKk54I66xyfuDI=",
+                      "nonce": "NjBhZTllMjZjYmQxYg==",
+                      "seed": "2021-05-26T14:14:46-05:00"
+                    },
+                    "locale": "es_CO",
+                    "buyer": {
+                      "name": "Ms. Nelle Beahan DVM",
+                      "surname": "Spencer",
+                      "email": "gsteuber@kling.com",
+                      "documentType": "CC",
+                      "document": "1040035000",
+                      "mobile": "3006108300",
+                      "address": {
+                        "street": "Carrera 65 #45 20",
+                        "city": "Estherborough",
+                        "state": "Antioquia",
+                        "postalCode": "48107",
+                        "country": "CO",
+                        "phone": "5695155708"
+                      }
+                    },
+                    "payment": {
+                      "reference": "TEST_20210526_141005",
+                      "description": "Cum vitae et consequatur quas adipisci ut rem.",
+                      "amount": {
+                        "taxes": [
+                          {
+                            "kind": "ice",
+                            "amount": 2.76
+                          },
+                          {
+                            "kind": "valueAddedTax",
+                            "amount": 4.37
+                          }
+                        ],
+                        "details": [
+                          {
+                            "kind": "shipping",
+                            "amount": 1.15
+                          },
+                          {
+                            "kind": "tip",
+                            "amount": 1.15
+                          },
+                          {
+                            "kind": "subtotal",
+                            "amount": 23
+                          }
+                        ],
+                        "currency": "USD",
+                        "total": 32.43
+                      },
+                      "recurring": {
+                        "periodicity": "D",
+                        "interval": 7,
+                        "nextPayment": "2021-05-28",
+                        "maxPeriods": 4,
+                        "notificationUrl": "https://dnetix.co/ping/recurring_notification"
+                      },
+                      "shipping": {
+                        "name": "Ms. Nelle Beahan DVM",
+                        "surname": "Spencer",
+                        "email": "gsteuber@kling.com",
+                        "documentType": "CC",
+                        "document": "3154383838",
+                        "mobile": "3006108300",
+                        "address": {
+                          "street": "278 Megane Road Apt. 109",
+                          "city": "Estherborough",
+                          "state": "Antioquia",
+                          "postalCode": "48107",
+                          "country": "US",
+                          "phone": "569-515-5708 x98389"
+                        }
+                      }
+                    },
+                    "instrument": {
+                      "card": {
+                        "number": "36545400000008",
+                        "expiration": "12/20",
+                        "cvv": "123",
+                        "installments": 2
+                      },
+                      "credit": {
+                        "code": "1",
+                        "type": "02",
+                        "groupCode": "P",
+                        "installment": 24
+                      }
+                    },
+                    "ipAddress": "190.85.82.130",
+                    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+                    "additional": {
+                      "some_key": "Value to be stored",
+                      "another_key": "Another value to be stored"
+                    }
+                  }
+                },
+                "recurring": {
+                  "value": {
+                    "auth": {
+                      "login": "c4ca4238a0b923820dcc509a6f75849b",
+                      "tranKey": "cgqVhiaKSUSJmYQsXMsBqpfjz155nyKk54I66xyfuDI=",
+                      "nonce": "NjBhZTllMjZjYmQxYg==",
+                      "seed": "2021-05-26T14:14:46-05:00"
+                    },
+                    "payer": {
+                      "name": "Ms. Nelle Beahan DVM",
+                      "surname": "Spencer",
+                      "email": "gsteuber@kling.com",
+                      "documentType": "CC",
+                      "document": "1040035000",
+                      "mobile": "3006108300"
+                    },
+                    "payment": {
+                      "reference": "TEST_20210526_141005",
+                      "description": "Cum vitae et consequatur quas adipisci ut rem.",
+                      "amount": {
+                        "currency": "USD",
+                        "total": 32.43
+                      },
+                      "recurring": {
+                        "periodicity": "D",
+                        "interval": 7,
+                        "nextPayment": "2021-05-28",
+                        "maxPeriods": 4,
+                        "notificationUrl": "https://dnetix.co/ping/recurring_notification"
+                      }
+                    },
+                    "instrument": {
+                      "card": {
+                        "number": "36545400000008",
+                        "expiration": "12/20",
+                        "cvv": "123",
+                        "installments": 2
+                      }
+                    },
+                    "ipAddress": "190.85.82.130",
+                    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+                    "additional": {
+                      "some_key": "Value to be stored",
+                      "another_key": "Another value to be stored"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "internalReference": {
+                      "type": "number"
+                    },
+                    "reference": {
+                      "type": "string"
+                    },
+                    "paymentMethod": {
+                      "type": "string"
+                    },
+                    "franchise": {
+                      "type": "string"
+                    },
+                    "franchiseName": {
+                      "type": "string"
+                    },
+                    "issuerName": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "$ref": "#/components/schemas/Amount"
+                    },
+                    "conversion": {
+                      "$ref": "#/components/schemas/AmountConversion"
+                    },
+                    "authorization": {
+                      "type": "string"
+                    },
+                    "receipt": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "refunded": {
+                      "type": "string"
+                    },
+                    "lastDigits": {
+                      "type": "string"
+                    },
+                    "additional": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/tokenize": {
+      "post": {
+        "summary": "Tokenization",
+        "operationId": "post-gateway-tokenize",
+        "description": "This service lets you save credit cards securely. A token will be generated via a request containing the card information, which may be used in the processing service and is, for all effects and purposes, equal to a credit card in Placetopay. The difference is that, instead of the card structure, the token structure is sent.\n\nBefore using this service, you should consult the information service to check if it is necessary to generate an OTP to the client; if it is necessary, ask the person for the token and send it in the consumption data.\n",
+        "tags": [
+          "Tokenizar una tarjeta"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "payer": {
+                    "$ref": "#/components/schemas/Person"
+                  },
+                  "instrument": {
+                    "$ref": "#/components/schemas/Instrument"
+                  },
+                  "ipAddress": {
+                    "type": "string"
+                  },
+                  "userAgent": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "instrument": {
+                      "$ref": "#/components/schemas/Instrument"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/transaction": {
+      "post": {
+        "summary": "Operaciones sobre una transacción",
+        "operationId": "post-gateway-transaction",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "internalReference": {
+                      "type": "number"
+                    },
+                    "reference": {
+                      "type": "string"
+                    },
+                    "paymentMethod": {
+                      "type": "string"
+                    },
+                    "franchise": {
+                      "type": "string"
+                    },
+                    "franchiseName": {
+                      "type": "string"
+                    },
+                    "issuerName": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "$ref": "#/components/schemas/Amount"
+                    },
+                    "conversion": {
+                      "$ref": "#/components/schemas/AmountConversion"
+                    },
+                    "authorization": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "receipt": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "refunded": {
+                      "type": "string"
+                    },
+                    "lastDigits": {
+                      "type": "string"
+                    },
+                    "additional": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "Ejemplo": {
+                    "value": {
+                      "status": {
+                        "status": "APPROVED",
+                        "reason": "00",
+                        "message": "Aprobada",
+                        "date": "2018-02-05T21:32:41-05:00"
+                      },
+                      "internalReference": 1449217015,
+                      "reference": "TEST_20171108_144400",
+                      "paymentMethod": "ID_DN",
+                      "franchise": "diners",
+                      "franchiseName": "Diners",
+                      "issuerName": "Diners Club",
+                      "amount": {
+                        "taxes": [
+                          {
+                            "kind": "valueAddedTax",
+                            "amount": 0,
+                            "base": 0
+                          },
+                          {
+                            "kind": "ice",
+                            "amount": 0,
+                            "base": 0
+                          }
+                        ],
+                        "details": [
+                          {
+                            "kind": "shipping",
+                            "amount": 0
+                          },
+                          {
+                            "kind": "tip",
+                            "amount": 0
+                          }
+                        ],
+                        "currency": "COP",
+                        "total": 159939.56
+                      },
+                      "conversion": {
+                        "from": {
+                          "currency": "COP",
+                          "total": 159939.56
+                        },
+                        "to": {
+                          "currency": "USD",
+                          "total": 56.43
+                        },
+                        "factor": 0.00035282077804890796
+                      },
+                      "authorization": null,
+                      "receipt": 1449217015,
+                      "type": "CREDIT",
+                      "refunded": false,
+                      "lastDigits": "0008",
+                      "provider": "INTERDIN",
+                      "discount": null,
+                      "processorFields": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Permite realizar un reverso, re-autorización, reembolso o cash out sobre una transacción existente",
+        "tags": [
+          "Reversar una transaccion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "internalReference": {
+                    "type": "number"
+                  },
+                  "authorization": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "Reverso": {
+                  "value": {
+                    "auth": {
+                      "login": "6dd490faf9cb87a9862245da41170ff2",
+                      "tranKey": "JUfKi8+W//kX43WZd8FcnNsdl7zkaeAQdmSOudWcVi0=",
+                      "nonce": "MzgwYWYwMjc2ZWUzODA5YmI1MDQ1YmNjYzdlNzY1MTY=",
+                      "seed": "2021-03-02T17:03:50+01:00"
+                    },
+                    "internalReference": 1505723583,
+                    "authorization": "999999",
+                    "action": "reverse"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": []
+    },
+    "/search": {
+      "post": {
+        "summary": "Búsqueda de transacciones",
+        "operationId": "post-gateway-search",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "date": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "reason",
+                        "message",
+                        "date"
+                      ]
+                    },
+                    "transactions": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "required": [
+                          "date",
+                          "transactionDate",
+                          "internalReference",
+                          "reference",
+                          "paymentMethod",
+                          "franchise",
+                          "franchiseName",
+                          "issuerName",
+                          "authorization",
+                          "receipt",
+                          "type",
+                          "refunded",
+                          "lastDigits",
+                          "provider"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "reason": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "message": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "date": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "reason",
+                              "message",
+                              "date"
+                            ]
+                          },
+                          "date": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "transactionDate": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "internalReference": {
+                            "type": "number"
+                          },
+                          "reference": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "paymentMethod": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "franchise": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "franchiseName": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "issuerName": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "taxes": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "minItems": 1,
+                                "items": {
+                                  "required": [
+                                    "kind",
+                                    "amount",
+                                    "base"
+                                  ],
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "amount": {
+                                      "type": "number"
+                                    },
+                                    "base": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              },
+                              "details": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "minItems": 1,
+                                "items": {
+                                  "required": [
+                                    "kind"
+                                  ],
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  }
+                                }
+                              },
+                              "currency": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "total": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "taxes",
+                              "details",
+                              "currency",
+                              "total"
+                            ]
+                          },
+                          "conversion": {
+                            "type": "object",
+                            "properties": {
+                              "from": {
+                                "type": "object",
+                                "properties": {
+                                  "currency": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "total": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": [
+                                  "currency",
+                                  "total"
+                                ]
+                              },
+                              "to": {
+                                "type": "object",
+                                "properties": {
+                                  "currency": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "total": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": [
+                                  "currency",
+                                  "total"
+                                ]
+                              },
+                              "factor": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "from",
+                              "to",
+                              "factor"
+                            ]
+                          },
+                          "authorization": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "receipt": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "refunded": {
+                            "type": "boolean"
+                          },
+                          "lastDigits": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "provider": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "discount": {},
+                          "processorFields": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "b24": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "b24"
+                            ]
+                          },
+                          "additional": {
+                            "type": "object",
+                            "properties": {
+                              "merchantCode": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "terminalNumber": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "bin": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "expiration": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "installments": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "merchantCode",
+                              "terminalNumber",
+                              "bin",
+                              "expiration",
+                              "installments"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "transactions"
+                  ]
+                },
+                "examples": {
+                  "Ejemplo": {
+                    "value": {
+                      "status": {
+                        "status": "OK",
+                        "reason": "00",
+                        "message": "La petición se ha procesado correctamente",
+                        "date": "2021-03-03T13:40:57-05:00"
+                      },
+                      "transactions": [
+                        {
+                          "status": {
+                            "status": "APPROVED",
+                            "reason": "00",
+                            "message": "Aprobada",
+                            "date": "2021-03-03T13:40:57-05:00"
+                          },
+                          "date": "2021-03-02T11:05:49-05:00",
+                          "transactionDate": "2021-03-02T11:05:49-05:00",
+                          "internalReference": 1505723583,
+                          "reference": "TEST_20171108_144400",
+                          "paymentMethod": "CR_VS",
+                          "franchise": "visa",
+                          "franchiseName": "Visa",
+                          "issuerName": "JPMORGAN CHASE BANK, N.A.",
+                          "amount": {
+                            "taxes": [
+                              {
+                                "kind": "valueAddedTax",
+                                "amount": 0,
+                                "base": 0
+                              }
+                            ],
+                            "details": [
+                              {
+                                "kind": "shipping"
+                              },
+                              {
+                                "kind": "tip"
+                              }
+                            ],
+                            "currency": "COP",
+                            "total": "1000.00"
+                          },
+                          "conversion": {
+                            "from": {
+                              "currency": "COP",
+                              "total": "1000.00"
+                            },
+                            "to": {
+                              "currency": "COP",
+                              "total": "1000.00"
+                            },
+                            "factor": 1
+                          },
+                          "authorization": "999999",
+                          "receipt": "1605385146",
+                          "type": "AUTH_ONLY",
+                          "refunded": true,
+                          "lastDigits": "****1111",
+                          "provider": "CREDIBANCO",
+                          "discount": null,
+                          "processorFields": {
+                            "id": "f31842fddf772930f8f80d697009b8c1",
+                            "b24": "000"
+                          },
+                          "additional": {
+                            "merchantCode": "011271442",
+                            "terminalNumber": "00057742",
+                            "bin": "411111",
+                            "expiration": "1222",
+                            "installments": 1
+                          }
+                        },
+                        {
+                          "status": {
+                            "status": "APPROVED",
+                            "reason": "00",
+                            "message": "Aprobada",
+                            "date": "2021-03-03T13:40:57-05:00"
+                          },
+                          "date": "2021-03-02T11:28:15-05:00",
+                          "transactionDate": "2021-03-02T11:28:15-05:00",
+                          "internalReference": 1505726109,
+                          "reference": "TEST_20171108_144400",
+                          "paymentMethod": "CR_VS",
+                          "franchise": "visa",
+                          "franchiseName": "Visa",
+                          "issuerName": "JPMORGAN CHASE BANK, N.A.",
+                          "amount": {
+                            "taxes": [
+                              {
+                                "kind": "valueAddedTax",
+                                "amount": 0,
+                                "base": 0
+                              }
+                            ],
+                            "details": [
+                              {
+                                "kind": "shipping"
+                              },
+                              {
+                                "kind": "tip"
+                              }
+                            ],
+                            "currency": "COP",
+                            "total": "1000.00"
+                          },
+                          "conversion": {
+                            "from": {
+                              "currency": "COP",
+                              "total": "1000.00"
+                            },
+                            "to": {
+                              "currency": "COP",
+                              "total": "1000.00"
+                            },
+                            "factor": 1
+                          },
+                          "authorization": "999999",
+                          "receipt": null,
+                          "type": "CREDIT",
+                          "refunded": false,
+                          "lastDigits": "****1111",
+                          "provider": "CREDIBANCO",
+                          "discount": null,
+                          "processorFields": {
+                            "id": "7d87dc5ee4f7fa408214a1a06982b97b",
+                            "b24": "000"
+                          },
+                          "additional": {
+                            "merchantCode": "011271442",
+                            "terminalNumber": "00057742",
+                            "bin": "411111",
+                            "expiration": "1222",
+                            "installments": 1
+                          }
+                        },
+                        {
+                          "status": {
+                            "status": "APPROVED",
+                            "reason": "00",
+                            "message": "Aprobada",
+                            "date": "2021-03-03T13:40:57-05:00"
+                          },
+                          "date": "2021-03-02T11:47:04-05:00",
+                          "transactionDate": "2021-03-02T11:47:04-05:00",
+                          "internalReference": 1505728229,
+                          "reference": "TEST_20171108_144400",
+                          "paymentMethod": "CR_VS",
+                          "franchise": "visa",
+                          "franchiseName": "Visa",
+                          "issuerName": "JPMORGAN CHASE BANK, N.A.",
+                          "amount": {
+                            "taxes": [
+                              {
+                                "kind": "valueAddedTax",
+                                "amount": 0,
+                                "base": 0
+                              }
+                            ],
+                            "details": [
+                              {
+                                "kind": "shipping"
+                              },
+                              {
+                                "kind": "tip"
+                              }
+                            ],
+                            "currency": "COP",
+                            "total": "1000.00"
+                          },
+                          "conversion": {
+                            "from": {
+                              "currency": "COP",
+                              "total": "1000.00"
+                            },
+                            "to": {
+                              "currency": "COP",
+                              "total": "1000.00"
+                            },
+                            "factor": 1
+                          },
+                          "authorization": "999999",
+                          "receipt": "1020330770",
+                          "type": "AUTH_ONLY",
+                          "refunded": false,
+                          "lastDigits": "****1111",
+                          "provider": "CREDIBANCO",
+                          "discount": null,
+                          "processorFields": {
+                            "id": "c3e5a278db727933e12796139cdbf506",
+                            "b24": "000"
+                          },
+                          "additional": {
+                            "merchantCode": "011271442",
+                            "terminalNumber": "00057742",
+                            "bin": "411111",
+                            "expiration": "0222",
+                            "installments": 1
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Consulta de una transaccion"
+        ],
+        "description": "This service lets you search transactions by reference and amount. It is commonly used if there is a communication failure when creating a transaction to obtain the internal reference again.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                  "auth": {
+                    "type": "object",
+                    "properties": {
+                      "login": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "tranKey": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "nonce": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "seed": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "login",
+                      "tranKey",
+                      "nonce",
+                      "seed"
+                    ]
+                  },
+                  "reference": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "total": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "total"
+                    ]
+                  }
+                },
+                "required": [
+                  "auth",
+                  "reference",
+                  "amount"
+                ]
+              },
+              "examples": {
+                "Ejemplo": {
+                  "value": {
+                    "auth": {
+                      "login": "6dd490faf9cb87a9862245da41170ff2",
+                      "tranKey": "+FSGHsW3e6WrrHcIdBmqI+j6FFeUN4bidfPL7LeZgvE=",
+                      "nonce": "N2YzMGM1M2QxOTU3YzZmMzVlYmIzZTAyOGMwNjNkMmU=",
+                      "seed": "2021-03-03T19:40:37+01:00"
+                    },
+                    "reference": "TEST_20171108_144400",
+                    "amount": {
+                      "currency": "COP",
+                      "total": 1000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": []
+    },
+    "/interests": {
+      "post": {
+        "summary": "Interest Calculation (only in Ecuador)",
+        "operationId": "post-rest-gateway-interests",
+        "description": "This service should be used if the card requires that the interests be displayed (displayInterest is set to true); for example, this is how the values in the redirection service are shown.\n",
+        "tags": [
+          "Calculo de intereses"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "instrument": {
+                    "$ref": "#/components/schemas/Instrument"
+                  },
+                  "payment": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "values": {
+                      "$ref": "#/components/schemas/InterestValues"
+                    },
+                    "conversion": {
+                      "$ref": "#/components/schemas/AmountConversion"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/otp/generate": {
+      "parameters": [],
+      "post": {
+        "summary": "OTP Generation (only in Ecuador)",
+        "operationId": "post-rest-otp-generate",
+        "description": "This service is used if the otp is necessary for the card provided by the client (requireOtp is set to true), and the client should be allowed to enter the OTP to subsequently send it in the processing service; for example, this is how the redirection interface is captured.\n",
+        "tags": [
+          "Proceso OTP"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "instrument": {
+                    "$ref": "#/components/schemas/Instrument"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/otp/validate": {
+      "post": {
+        "summary": "Validación de OTP (solo Ecuador)",
+        "operationId": "post-rest-otp-validate",
+        "description": "It lets you validate that the OTP provided matches the one sent by the provider; if so, a \"signature\" value will be returned, which should be sent in the processing request as an \"otp\" to be taken into account when screening the transaction through the security filters\n",
+        "tags": [
+          "Proceso OTP"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": "string"
+                  },
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "instrument": {
+                    "$ref": "#/components/schemas/Instrument"
+                  },
+                  "payment": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "signature": {
+                      "type": "string"
+                    },
+                    "validated": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/report": {
+      "parameters": [],
+      "post": {
+        "summary": "Solicitar un reporte",
+        "operationId": "post-report",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "id": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "id"
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "status": {
+                        "status": "OK",
+                        "reason": "00",
+                        "message": "La solicitud se ha procesado exitosamente",
+                        "date": "2020-01-18T18:00:00-05:00"
+                      },
+                      "id": 1231
+                    }
+                  },
+                  "error": {
+                    "value": {
+                      "status": {
+                        "status": "FAILED",
+                        "reason": "BR",
+                        "message": "El reporte solicitado supera los 10 días",
+                        "date": "2020-01-18T18:00:00-05:00"
+                      },
+                      "id": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Lets you request that a transaction report be generated, and a process identifier is returned. After the callback is called, it can be obtained at the next endpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "required": [
+                      "startDate",
+                      "endDate"
+                    ],
+                    "properties": {
+                      "startDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2021-01-10T18:01:27-05:00"
+                      },
+                      "endDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2021-01-12T18:01:27-05:00"
+                      }
+                    }
+                  },
+                  "callbackUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "auth",
+                  "filters"
+                ]
+              },
+              "examples": {
+                "example-1": {
+                  "value": {
+                    "auth": {
+                      "login": "string",
+                      "tranKey": "string",
+                      "nonce": "string",
+                      "seed": "2019-08-24T14:15:22Z"
+                    },
+                    "filters": {
+                      "startDate": "2021-01-10T18:01:27-05:00",
+                      "endDate": "2019-08-24T14:15:22-05:00"
+                    },
+                    "compressionFormat": "zip",
+                    "callbackUrl": "http://example.com"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/report/obtain": {
+      "post": {
+        "summary": "Obtener un reporte previamente solicitado",
+        "operationId": "post-report-obtain",
+        "responses": {
+          "200": {
+            "description": "OK\n\nUna vez se tiene el reporte retorna la información, el cúal es un archivo separado por comas con los siguientes encabezados\n\n```\nid\ndate\ntransaction_date\nreference\ncurrency_code\namount\ntax\npayment_method\ninternal_reference\nstatus\nreason\nmerchant\nterminal\nauthorization\nrefunded\ninstallments\nlast_digits\nbank_currency\nbank_factor\nbank_amount\nissuer_name\npayer_document\npayer_first_name\npayer_last_name\npayer_email\nip_address\nbatch_number\nline_number\n```",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "example": {
+                    "value": "id,date,transaction_date,reference,currency_code,amount,tax,payment_method,internal_reference,status,reason,merchant,terminal,authorization,refunded,installments,last_digits,bank_currency,bank_factor,bank_amount,issuer_name,payer_document,payer_first_name,payer_last_name,payer_email,ip_address,batch_number,line_number\nc42977b5d4ff9d9613320c7ee98e9eb0,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,4113943,USD,2327,442.13,ID_VS,221,APPROVED,,000468232,00990101,,,1,0008,USD,1,2327,Testing Bank,32694548,Miss Joanne Fadel MD,Price,blangworth@hotmail.com,237.234.250.30,,\n315c9ca9e64bed46f24a2e18bdd76468,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,8122,USD,4457,846.83,ID_VS,222,APPROVED,,000468232,00990101,,,1,0008,USD,1,4457,Testing Bank,44056172,Charlotte Maggio,Steuber,drutherford@gmail.com,164.233.22.247,,\nfd239e99125c326e92137197fd5d1959,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,753446151,USD,3798,721.62,ID_VS,223,APPROVED,,000468232,00990101,,,1,0008,USD,1,3798,Testing Bank,51751981,Mr. Abdiel Schroeder DDS,McKenzie,leonard.beier@runte.com,250.136.231.200,,\nbe945b27ff13291409b929cc9cb15274,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,482657,USD,1401,266.19,ID_VS,224,APPROVED,,000468232,00990101,,,1,0008,USD,1,1401,Testing Bank,98958097,Dr. Mia Abshire,Douglas,antonia.blanda@wyman.com,32.1.213.30,,\n3aaa74df49cf3634276675c95e49f2af,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,77616851,USD,1921,364.99,ID_VS,225,APPROVED,,000468232,00990101,,,1,0008,USD,1,1921,Testing Bank,6211299,Dr. Marcelina Huel I,Considine,vlangworth@emard.biz,249.218.136.4,,\n6e89e692975bb117db78360c8ebf0a00,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,74141,USD,773,146.87,ID_VS,226,APPROVED,,000468232,00990101,,,1,0008,USD,1,773,Testing Bank,22736252,Melody Goodwin DDS,Gerlach,iblock@ohara.com,168.87.8.132,,\nb50e4e8cca851a578fa40917030397a3,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,828,USD,473,89.87,ID_VS,227,APPROVED,,000468232,00990101,,,1,0008,USD,1,473,Testing Bank,9397147,Freeman Kirlin,Aufderhar,drobel@kshlerin.com,21.185.38.170,,\nb66ffe1bff91a15986cba677bbaeaa7f,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,581122,USD,1767,335.73,ID_VS,228,APPROVED,,000468232,00990101,,,1,0008,USD,1,1767,Testing Bank,62818359,Mrs. Rosina Mann,Schaefer,ctremblay@gmail.com,15.8.188.238,,\n135afcb2f872cf55168461e7e874242a,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,3896507,USD,7,1.33,ID_VS,229,APPROVED,,000468232,00990101,,,1,0008,USD,1,7,Testing Bank,10597030,Kristy Purdy IV,Mills,clyde68@hotmail.com,148.232.85.97,,\n19868ea1110eca766186806ef0e38f71,2021-01-13T01:54:50-05:00,2021-01-13T01:54:50-05:00,68490,USD,4987,947.53,ID_VS,230,APPROVED,,000468232,00990101,,,1,0008,USD,1,4987,Testing Bank,32385057,Mr. Harley Howe,Rogahn,oreilly.onie@hotmail.com,87.121.113.190,,"
+                  }
+                }
+              }
+            }
+          },
+          "425": {
+            "description": "Too Early\n\nCuando la petición se realiza antes de que se termine de generar el reporte",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                  "auth": {
+                    "$ref": "#/components/schemas/Autentication"
+                  },
+                  "id": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "auth",
+                  "id"
+                ]
+              }
+            }
+          },
+          "description": ""
+        },
+        "description": "Permite obtener un reporte previamente generado",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "gzip"
+              ]
+            },
+            "in": "header",
+            "name": "accept-encoding",
+            "description": "Allows to provide gzip as a compression format"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Autentication": {
+        "title": "Autentication",
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "tranKey": {
+            "type": "string"
+          },
+          "nonce": {
+            "type": "string"
+          },
+          "seed": {
+            "type": "string"
+          }
+        },
+        "description": "Structure that contains the site's authentication information generated in accordance with the WSSE UsernameToken Profile 1.1."
+      },
+      "Instrument": {
+        "title": "Instrument",
+        "type": "object",
+        "description": "Structure that contains information about the payment of the transaction requested to the web service.",
+        "properties": {
+          "card": {
+            "$ref": "#/components/schemas/Card"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "credit": {
+            "$ref": "#/components/schemas/Credit"
+          },
+          "otp": {
+            "type": "string"
+          }
+        }
+      },
+      "Card": {
+        "title": "Card",
+        "type": "object",
+        "description": "Structure that contains the card information.",
+        "properties": {
+          "number": {
+            "type": "string"
+          },
+          "expiration": {
+            "type": "string",
+            "example": "12/22",
+            "pattern": "^[01]\\d\\/\\d{2}$"
+          },
+          "cvv": {
+            "type": "string"
+          },
+          "installments": {
+            "type": "number"
+          }
+        }
+      },
+      "Token": {
+        "title": "Token",
+        "type": "object",
+        "description": "Structure that contains information about the token associated to the card.",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "subtoken": {
+            "type": "string"
+          },
+          "franchise": {
+            "type": "string"
+          },
+          "franchiseName": {
+            "type": "string"
+          },
+          "issuerName": {
+            "type": "string"
+          },
+          "lastDigits": {
+            "type": "string"
+          },
+          "validUntil": {
+            "type": "string"
+          }
+        }
+      },
+      "Credit": {
+        "title": "Credit",
+        "type": "object",
+        "description": "Structure that contains information about the type of credit.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "groupCode": {
+            "type": "string"
+          },
+          "installment": {
+            "type": "integer"
+          }
+        }
+      },
+      "Payment": {
+        "title": "Payment",
+        "type": "object",
+        "description": "Structure that contains information about the payment of the transaction requested to the web service.",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Amount"
+          },
+          "Dispersion": {
+            "$ref": "#/components/schemas/Dispersion"
+          }
+        }
+      },
+      "Amount": {
+        "title": "Amount",
+        "type": "object",
+        "description": "Structure that contains information about the payment of the transaction requested to the web service.",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "COP",
+              "CRC",
+              "EUR",
+              "CAD",
+              "AUD",
+              "GBP",
+              "MXN"
+            ],
+            "example": "COP",
+            "pattern": "^[A-Z]{3}$",
+            "minLength": 3,
+            "maxLength": 3
+          },
+          "total": {
+            "type": "number"
+          },
+          "taxes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxDetail"
+            }
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AmountDetail"
+            }
+          }
+        }
+      },
+      "TaxDetail": {
+        "title": "TaxDetail",
+        "type": "object",
+        "description": "Estructura para almacenar información sobre un impuesto.",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "base": {
+            "type": "number"
+          }
+        }
+      },
+      "AmountDetail": {
+        "title": "AmountDetail",
+        "type": "object",
+        "description": "Estructura para almacenar información sobre un valor adicional.\n",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "Dispersion": {
+        "title": "Dispersion",
+        "type": "object",
+        "description": "Structure that contains the information required for a distribution payment.",
+        "properties": {
+          "agreement": {
+            "type": "integer"
+          },
+          "agreementType": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "Status": {
+        "title": "Status",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        },
+        "description": "Structure that contains information about a request or payment and gives information on its current status."
+      },
+      "InterestValues": {
+        "title": "InterestValues",
+        "type": "object",
+        "description": "Structure that contains information about the interest calculation for a type of credit and amount.",
+        "properties": {
+          "original": {
+            "type": "number"
+          },
+          "installment": {
+            "type": "number"
+          },
+          "interest": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      },
+      "AmountConversion": {
+        "title": "AmountConversion",
+        "type": "object",
+        "description": "Structure to define the conversion factor and values.",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/AmountBase"
+          },
+          "to": {
+            "$ref": "#/components/schemas/AmountBase"
+          },
+          "factor": {
+            "type": "number"
+          }
+        }
+      },
+      "AmountBase": {
+        "title": "AmountBase",
+        "type": "object",
+        "description": "Structure representing an amount, defining currency and total.",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      },
+      "Person": {
+        "title": "Person",
+        "type": "object",
+        "description": "Structure that reflects information about a person involved in a transaction.",
+        "properties": {
+          "documentType": {
+            "type": "string"
+          },
+          "Document": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "mobile": {
+            "type": "string"
+          }
+        }
+      },
+      "Address": {
+        "title": "Address",
+        "type": "object",
+        "description": "Structure that contains information about a street address.",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {},
+    "responses": {}
+  }
+}
