@@ -31,6 +31,10 @@ IMPORTANT: Pay special attention to the “preAuthorization” node. These are t
 
 ## Reauthorization
 
+```json
+Does not apply to Puerto Rico
+```
+
 REAUTHORIZATION type transactions are used to modify the amount  defined as security deposit, which was previously separated through a CHECKIN type transaction.This performs a new authorization (reauthorization) from the bank (provider).
 
 ### Reauthorization Request
