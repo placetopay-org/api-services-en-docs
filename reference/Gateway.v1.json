@@ -28,9 +28,6 @@
         "summary": "Transaction Query",
         "operationId": "post-rest-gateway-query",
         "description": "Allows users to perform transaction queries.",
-        "tags": [
-          "Consulta de una transaccion"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -117,10 +114,46 @@
       "parameters": []
     },
     "/information": {
+      "parameters": [],
       "post": {
-        "summary": "Information request",
-        "operationId": "post-rest-gateway-information",
-        "description": "This service provides information about the user's card that will be processed, such as which services will be used for it and the types of credit available for it, if applicable. If there are no types of credits, an empty array is returned, and if there are, each type of credit should be iterated with the installments in the array.\n",
+        "summary": "",
+        "operationId": "post-information",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "cardTypes": {
+                      "type": "string"
+                    },
+                    "requiereOtp": {
+                      "type": "string"
+                    },
+                    "requiereCvv2": {
+                      "type": "string"
+                    },
+                    "threeDS": {
+                      "type": "string"
+                    },
+                    "credits": {
+                      "$ref": "#/components/schemas/Credit"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "This service provides information about the user's card that will be processed, such as which services will be used for it and the types of credit available for it, if applicable. If there are no types of credits, an empty array is returned, and if there are, each type of credit should be iterated with the installments in the array.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -141,62 +174,22 @@
                   },
                   "payment": {
                     "$ref": "#/components/schemas/Payment"
-                  }
-                }
-              }
-            }
-          },
-          "description": ""
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "$ref": "#/components/schemas/Status"
-                    },
-                    "provider": {
-                      "type": "string"
-                    },
-                    "cardTypes": {
-                      "type": "string"
-                    },
-                    "requiereCvv2": {
-                      "type": "boolean"
-                    },
-                    "requiereOtp": {
-                      "type": "boolean"
-                    },
-                    "threeDS": {
-                      "type": "string"
-                    },
-                    "credits": {
-                      "$ref": "#/components/schemas/Credit"
-                    }
+                  },
+                  "": {
+                    "type": "string"
                   }
                 }
               }
             }
           }
-        },
-        "tags": [
-          "Obtener información según la tarjeta"
-        ]
-      },
-      "parameters": []
+        }
+      }
     },
     "/process": {
       "post": {
         "summary": "Procesamiento de transacción",
         "operationId": "post-gateway-process",
         "description": "This service lets you charge the user's card. The instrument parameters are variable; if the type of credit or OTP are not requested, you don't need to send these variables; payer is always required; buyer is optional but recommended.",
-        "tags": [
-          "Procesamiento de transaccion"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -490,9 +483,6 @@
         "summary": "Tokenization",
         "operationId": "post-gateway-tokenize",
         "description": "This service lets you save credit cards securely. A token will be generated via a request containing the card information, which may be used in the processing service and is, for all effects and purposes, equal to a credit card in Placetopay. The difference is that, instead of the card structure, the token structure is sent.\n\nBefore using this service, you should consult the information service to check if it is necessary to generate an OTP to the client; if it is necessary, ask the person for the token and send it in the consumption data.\n",
-        "tags": [
-          "Tokenizar una tarjeta"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -680,9 +670,6 @@
           }
         },
         "description": "Permite realizar un reverso, re-autorización, reembolso o cash out sobre una transacción existente",
-        "tags": [
-          "Reversar una transaccion"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1246,9 +1233,6 @@
             }
           }
         },
-        "tags": [
-          "Consulta de una transaccion"
-        ],
         "description": "This service lets you search transactions by reference and amount. It is commonly used if there is a communication failure when creating a transaction to obtain the internal reference again.",
         "requestBody": {
           "content": {
@@ -1340,9 +1324,6 @@
         "summary": "Interest Calculation (only in Ecuador)",
         "operationId": "post-rest-gateway-interests",
         "description": "This service should be used if the card requires that the interests be displayed (displayInterest is set to true); for example, this is how the values in the redirection service are shown.\n",
-        "tags": [
-          "Calculo de intereses"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1401,9 +1382,6 @@
         "summary": "OTP Generation (only in Ecuador)",
         "operationId": "post-rest-otp-generate",
         "description": "This service is used if the otp is necessary for the card provided by the client (requireOtp is set to true), and the client should be allowed to enter the OTP to subsequently send it in the processing service; for example, this is how the redirection interface is captured.\n",
-        "tags": [
-          "Proceso OTP"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1451,9 +1429,6 @@
         "summary": "Validación de OTP (solo Ecuador)",
         "operationId": "post-rest-otp-validate",
         "description": "It lets you validate that the OTP provided matches the one sent by the provider; if so, a \"signature\" value will be returned, which should be sent in the processing request as an \"otp\" to be taken into account when screening the transaction through the security filters\n",
-        "tags": [
-          "Proceso OTP"
-        ],
         "requestBody": {
           "content": {
             "application/json": {
