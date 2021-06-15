@@ -718,7 +718,7 @@
     },
     "/search": {
       "post": {
-        "summary": "Búsqueda de transacciones",
+        "summary": "Transaction Search",
         "operationId": "post-gateway-search",
         "responses": {
           "200": {
@@ -1426,7 +1426,7 @@
     },
     "/otp/validate": {
       "post": {
-        "summary": "Validación de OTP (solo Ecuador)",
+        "summary": "OTP Validation (only in Ecuador)",
         "operationId": "post-rest-otp-validate",
         "description": "It lets you validate that the OTP provided matches the one sent by the provider; if so, a \"signature\" value will be returned, which should be sent in the processing request as an \"otp\" to be taken into account when screening the transaction through the security filters\n",
         "requestBody": {
