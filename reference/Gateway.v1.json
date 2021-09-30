@@ -2422,7 +2422,7 @@
         "description": "Structure that contains the information required for a distribution payment.",
         "properties": {
           "agreement": {
-            "type": "integer",
+            "type": "string",
             "description": "Transaction recipient identifier. For transaction main site, it must be null.",
             "nullable": true
           },
