@@ -408,6 +408,152 @@
                       "another_key": "Another value to be stored"
                     }
                   }
+                },
+                "dispersion airline": {
+                  "auth": {
+                    "login": "c4ca4238a0b923820dcc509a6f75849b",
+                    "tranKey": "cgqVhiaKSUSJmYQsXMsBqpfjz155nyKk54I66xyfuDI=",
+                    "nonce": "NjBhZTllMjZjYmQxYg==",
+                    "seed": "2021-05-26T14:14:46-05:00"
+                  },
+                  "payer": {
+                    "name": "Diego",
+                    "email": "diego.calle@placetopay.com"
+                  },
+                  "payment": {
+                    "reference": "ON1434012-PN1433129",
+                    "description": "Vuelo 50 AV2020",
+                    "amount": {
+                      "taxes": [
+                        {
+                          "kind": "airportTax",
+                          "amount": 63
+                        },
+                        {
+                          "kind": "valueAddedTax",
+                          "amount": 158.47
+                        }
+                      ],
+                      "currency": "USD",
+                      "total": 1161.12
+                    },
+                    "dispersion": [
+                      {
+                        "agreement": 2,
+                        "agreementType": "AIRLINE",
+                        "amount": {
+                          "taxes": [
+                            {
+                              "kind": "airportTax",
+                              "amount": 163
+                            },
+                            {
+                              "kind": "valueAddedTax",
+                              "amount": 142.5
+                            }
+                          ],
+                          "currency": "USD",
+                          "total": 1055.5
+                        }
+                      },
+                      {
+                        "agreement": null,
+                        "agreementType": "MERCHANT",
+                        "amount": {
+                          "taxes": [
+                            {
+                              "kind": "valueAddedTax",
+                              "amount": 15.97
+                            }
+                          ],
+                          "currency": "USD",
+                          "total": 105.62
+                        }
+                      }
+                    ]
+                  },
+                  "instrument": {
+                    "card": {
+                      "number": "4110760000000032",
+                      "expiration": "12/20",
+                      "cvv": "123"
+                    }
+                  },
+                  "ipAddress": "190.85.90.130",
+                  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+                },
+                "dispersion merchant": {
+                  "auth": {
+                    "login": "c4ca4238a0b923820dcc509a6f75849b",
+                    "tranKey": "cgqVhiaKSUSJmYQsXMsBqpfjz155nyKk54I66xyfuDI=",
+                    "nonce": "NjBhZTllMjZjYmQxYg==",
+                    "seed": "2021-05-26T14:14:46-05:00"
+                  },
+                  "payer": {
+                    "name": "Diego",
+                    "email": "diego.calle@placetopay.com"
+                  },
+                  "payment": {
+                    "reference": "Ref",
+                    "description": "Description",
+                    "amount": {
+                      "taxes": [
+                        {
+                          "kind": "valueAddedTax",
+                          "amount": 158.47
+                        }
+                      ],
+                      "currency": "USD",
+                      "total": 1161.12
+                    },
+                    "dispersion": [
+                      {
+                        "agreement": null,
+                        "agreementType": "MERCHANT",
+                        "amount": {
+                          "taxes": [
+                            {
+                              "kind": "valueAddedTax",
+                              "amount": 142.5
+                            }
+                          ],
+                          "currency": "USD",
+                          "total": 855.5
+                        }
+                      },
+                      {
+                        "agreement": 7,
+                        "agreementType": "MERCHANT",
+                        "amount": {
+                          "taxes": [
+                            {
+                              "kind": "valueAddedTax",
+                              "amount": 15.97
+                            }
+                          ],
+                          "currency": "USD",
+                          "total": 105.62
+                        }
+                      },
+                      {
+                        "agreement": 3,
+                        "agreementType": "MERCHANT",
+                        "amount": {
+                          "currency": "USD",
+                          "total": 200
+                        }
+                      }
+                    ]
+                  },
+                  "instrument": {
+                    "card": {
+                      "number": "4110760000000032",
+                      "expiration": "12/20",
+                      "cvv": "123"
+                    }
+                  },
+                  "ipAddress": "190.85.90.130",
+                  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
                 }
               }
             }
@@ -468,7 +614,404 @@
                     },
                     "additional": {
                       "type": "object"
+                    },
+                    "dispersion": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "$ref": "#/components/schemas/Status"
+                          },
+                          "agreement": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "agreementType": {
+                            "type": "string",
+                            "enum": [
+                              "AIRLINE",
+                              "MERCHANT"
+                            ]
+                          },
+                          "authorization": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "receipt": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "amount": {
+                            "$ref": "#/components/schemas/Amount"
+                          },
+                          "refunded": {
+                            "type": "boolean"
+                          },
+                          "paymentMethod": {
+                            "type": "string"
+                          }
+                        }
+                      }
                     }
+                  }
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "status": {
+                        "status": "APPROVED",
+                        "reason": "00",
+                        "message": "Aprobada",
+                        "date": "2021-09-20T21:07:22-05:00"
+                      },
+                      "date": "2021-09-20T21:07:22-05:00",
+                      "transactionDate": "2021-09-20T21:07:22-05:00",
+                      "internalReference": 3,
+                      "reference": "1234567890",
+                      "paymentMethod": "ID_VS",
+                      "franchise": "visa",
+                      "franchiseName": "Visa",
+                      "issuerName": "Testing Bank",
+                      "amount": {
+                        "currency": "USD",
+                        "total": 57.8
+                      },
+                      "conversion": {
+                        "from": {
+                          "currency": "USD",
+                          "total": 57.8
+                        },
+                        "to": {
+                          "currency": "USD",
+                          "total": 57.8
+                        },
+                        "factor": 1
+                      },
+                      "authorization": "999999",
+                      "receipt": "3",
+                      "type": "AUTH_ONLY",
+                      "refunded": false,
+                      "lastDigits": "1111",
+                      "provider": "INTERDIN",
+                      "discount": null,
+                      "processorFields": {
+                        "id": "86c6eb268c7086ec8a3201b0ec0c984a",
+                        "b24": "000"
+                      },
+                      "additional": {
+                        "merchantCode": "468231",
+                        "terminalNumber": "00990101",
+                        "credit": {
+                          "code": "1",
+                          "type": "02",
+                          "groupCode": "P",
+                          "installments": 24
+                        },
+                        "totalAmount": 63.58,
+                        "interestAmount": 5.78,
+                        "installmentAmount": 2.65,
+                        "iceAmount": 0,
+                        "batch": null,
+                        "line": null,
+                        "bin": "411111",
+                        "expiration": "1220"
+                      }
+                    }
+                  },
+                  "[dispersion] APPROVED": {
+                    "status": {
+                      "status": "APPROVED",
+                      "reason": "00",
+                      "message": "Aprobada",
+                      "date": "2021-09-24T11:51:31-05:00"
+                    },
+                    "date": "2021-09-24T11:51:31-05:00",
+                    "transactionDate": "2021-09-24T11:51:31-05:00",
+                    "internalReference": "41",
+                    "reference": "ON1434012-PN1433129",
+                    "paymentMethod": "CR_VS",
+                    "franchise": "visa",
+                    "franchiseName": "Visa",
+                    "issuerName": "BANCO DE GUAYAQUIL, S.A.",
+                    "amount": {
+                      "taxes": [
+                        {
+                          "kind": "airportTax",
+                          "amount": 63,
+                          "base": 0
+                        },
+                        {
+                          "kind": "valueAddedTax",
+                          "amount": 158.47,
+                          "base": 0
+                        }
+                      ],
+                      "currency": "USD",
+                      "total": 1161.12
+                    },
+                    "conversion": {
+                      "from": {
+                        "currency": "USD",
+                        "total": 1161.12
+                      },
+                      "to": {
+                        "currency": "USD",
+                        "total": 1161
+                      },
+                      "factor": 1
+                    },
+                    "authorization": "739877",
+                    "receipt": "713329175945",
+                    "type": "DISPERSION",
+                    "refunded": false,
+                    "lastDigits": "0032",
+                    "provider": "CREDIBANCO",
+                    "discount": null,
+                    "processorFields": {
+                      "id": "08c0284b20510c8db8dcb29137374718",
+                      "b24": "XX"
+                    },
+                    "additional": {
+                      "merchantCode": "123456",
+                      "terminalNumber": "12345678",
+                      "bin": "411076",
+                      "expiration": "1220"
+                    },
+                    "dispersion": [
+                      {
+                        "status": {
+                          "status": "APPROVED",
+                          "reason": "00",
+                          "message": null,
+                          "date": "2021-09-24T11:51:31-05:00"
+                        },
+                        "agreement": 1,
+                        "type": "AIRLINE",
+                        "authorization": "739877",
+                        "receipt": "713329175945",
+                        "amount": {
+                          "currency": "CLP",
+                          "total": 638155.3
+                        },
+                        "refunded": false,
+                        "paymentMethod": "PS_VS"
+                      },
+                      {
+                        "status": {
+                          "status": "APPROVED",
+                          "reason": "00",
+                          "message": null,
+                          "date": "2021-09-24T11:51:31-05:00"
+                        },
+                        "agreement": null,
+                        "type": "MERCHANT",
+                        "authorization": "000000",
+                        "receipt": null,
+                        "amount": {
+                          "currency": "COP",
+                          "total": 297580
+                        },
+                        "refunded": false,
+                        "paymentMethod": "CR_VS"
+                      }
+                    ]
+                  },
+                  "[dispersion] PENDING": {
+                    "status": {
+                      "status": "PENDING",
+                      "reason": "?-",
+                      "message": "Transacción pendiente",
+                      "date": "2021-09-24T11:51:31-05:00"
+                    },
+                    "date": "2021-09-24T11:51:31-05:00",
+                    "transactionDate": "2021-09-24T11:51:31-05:00",
+                    "internalReference": "41",
+                    "reference": "ON1434012-PN1433129",
+                    "paymentMethod": "CR_VS",
+                    "franchise": "visa",
+                    "franchiseName": "Visa",
+                    "issuerName": "BANCO DE GUAYAQUIL, S.A.",
+                    "amount": {
+                      "taxes": [
+                        {
+                          "kind": "airportTax",
+                          "amount": 63,
+                          "base": 0
+                        },
+                        {
+                          "kind": "valueAddedTax",
+                          "amount": 158.47,
+                          "base": 0
+                        }
+                      ],
+                      "currency": "USD",
+                      "total": 1161.12
+                    },
+                    "conversion": {
+                      "from": {
+                        "currency": "USD",
+                        "total": 1161.12
+                      },
+                      "to": {
+                        "currency": "USD",
+                        "total": 1161
+                      },
+                      "factor": 1
+                    },
+                    "authorization": "000000",
+                    "receipt": "713329175945",
+                    "type": "DISPERSION",
+                    "refunded": false,
+                    "lastDigits": "0032",
+                    "provider": "CREDIBANCO",
+                    "discount": null,
+                    "processorFields": {
+                      "id": "08c0284b20510c8db8dcb29137374718",
+                      "b24": "XX"
+                    },
+                    "additional": {
+                      "merchantCode": "123456",
+                      "terminalNumber": "12345678",
+                      "bin": "411076",
+                      "expiration": "1220"
+                    },
+                    "dispersion": [
+                      {
+                        "status": {
+                          "status": "PENDING",
+                          "reason": "?-",
+                          "message": "Transacción pendiente",
+                          "date": "2021-09-24T11:51:31-05:00"
+                        },
+                        "agreement": 1,
+                        "type": "AIRLINE",
+                        "authorization": "000000",
+                        "receipt": "713329175945",
+                        "amount": {
+                          "currency": "CLP",
+                          "total": 638155.3
+                        },
+                        "refunded": false,
+                        "paymentMethod": "PS_VS"
+                      },
+                      {
+                        "status": {
+                          "status": "PENDING_PROCESS",
+                          "reason": "?-",
+                          "message": null,
+                          "date": "2021-09-24T11:51:31-05:00"
+                        },
+                        "agreement": null,
+                        "type": "MERCHANT",
+                        "authorization": "000000",
+                        "receipt": null,
+                        "amount": {
+                          "currency": "COP",
+                          "total": 297580
+                        },
+                        "refunded": false,
+                        "paymentMethod": "CR_VS"
+                      }
+                    ]
+                  },
+                  "[dispersion] APPROVED_PARTIAL": {
+                    "status": {
+                      "status": "APPROVED_PARTIAL",
+                      "reason": "XX",
+                      "message": "Comercio no configurado propiamente para la franquicia seleccionada",
+                      "date": "2021-09-24T11:51:31-05:00"
+                    },
+                    "date": "2021-09-24T11:51:31-05:00",
+                    "transactionDate": "2021-09-24T11:51:31-05:00",
+                    "internalReference": "41",
+                    "reference": "ON1434012-PN1433129",
+                    "paymentMethod": "CR_VS",
+                    "franchise": "visa",
+                    "franchiseName": "Visa",
+                    "issuerName": "BANCO DE GUAYAQUIL, S.A.",
+                    "amount": {
+                      "taxes": [
+                        {
+                          "kind": "airportTax",
+                          "amount": 63,
+                          "base": 0
+                        },
+                        {
+                          "kind": "valueAddedTax",
+                          "amount": 158.47,
+                          "base": 0
+                        }
+                      ],
+                      "currency": "USD",
+                      "total": 1161.12
+                    },
+                    "conversion": {
+                      "from": {
+                        "currency": "USD",
+                        "total": 1161.12
+                      },
+                      "to": {
+                        "currency": "USD",
+                        "total": 1161
+                      },
+                      "factor": 1
+                    },
+                    "authorization": "739877",
+                    "receipt": "713329175945",
+                    "type": "DISPERSION",
+                    "refunded": false,
+                    "lastDigits": "0032",
+                    "provider": "CREDIBANCO",
+                    "discount": null,
+                    "processorFields": {
+                      "id": "08c0284b20510c8db8dcb29137374718",
+                      "b24": "XX"
+                    },
+                    "additional": {
+                      "merchantCode": "123456",
+                      "terminalNumber": "12345678",
+                      "bin": "411076",
+                      "expiration": "1220"
+                    },
+                    "dispersion": [
+                      {
+                        "status": {
+                          "status": "APPROVED",
+                          "reason": "00",
+                          "message": null,
+                          "date": "2021-09-24T11:51:31-05:00"
+                        },
+                        "agreement": 1,
+                        "type": "AIRLINE",
+                        "authorization": "739877",
+                        "receipt": "713329175945",
+                        "amount": {
+                          "currency": "CLP",
+                          "total": 638155.3
+                        },
+                        "refunded": false,
+                        "paymentMethod": "PS_VS"
+                      },
+                      {
+                        "status": {
+                          "status": "FAILED",
+                          "reason": "XX",
+                          "message": null,
+                          "date": "2021-09-24T11:51:31-05:00"
+                        },
+                        "agreement": null,
+                        "type": "MERCHANT",
+                        "authorization": "000000",
+                        "receipt": null,
+                        "amount": {
+                          "currency": "COP",
+                          "total": 297580
+                        },
+                        "refunded": false,
+                        "paymentMethod": "CR_VS"
+                      }
+                    ]
                   }
                 }
               }
@@ -1879,13 +2422,15 @@
         "description": "Structure that contains the information required for a distribution payment.",
         "properties": {
           "agreement": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Transaction recipient identifier. For transaction main site, it must be null.",
+            "nullable": true
           },
           "agreementType": {
             "type": "string"
           },
           "amount": {
-            "type": "number"
+            "$ref": "#/components/schemas/Amount"
           }
         }
       },
