@@ -66,3 +66,23 @@ Per this definition, in Evertec, with this type of transaction:
 - If the value of the CHECKOUT is 0, the preauthorization is cancelled, and the amount reserved in the previous requests is released.
 
 IMPORTANT: Note that the "status," "authorization," and "receipt" of the "preAuthorization" node changes during a successful CHECKOUT; therefore, these new values should be used in the REVERSE requests.
+
+## Dispersion
+
+This type of transaction is used to divide the payment between different entities besides the main site. In other words, when processing a transaction, part of the value is directed to the transaction authenticated site, and another part is sent to an airline or other sites. Also, that allows each part of the transaction to be processed by different providers.
+
+The dispersion transaction is made up of a type `DISPERSION` parent session that contains the transaction total value and the process' general status, and also of type` AUTH_ONLY` children sessions that contain the information of each of the parties dispersed. The authorization and receipt data of the parent transaction will be the same as the first transaction processed.
+
+When a transaction is pending, the other pending transactions will not be processed and have a `PENDING_PROCESS` status,until the pending transaction is resolved. The parent transaction will keep its `PENDING` state until all child sessions are resolved.
+
+When a transaction fails or is rejected, the other pending transactions will automatically be rejected as well, without establishing contact with the network. If a child transaction has already been approved before, it maintains its state and the parent transaction will change its state to `APPROVED_PARTIAL`.
+
+Transactions can be reversed together or separately. If a reverse is sent to a child transaction, only the child will be reversed. If it sent to the parent transaction, all transactions will be reversed.
+
+### Airline dispersion
+When a dispersal is made to an airline, it will be prioritized and processed first. If 3DS or credit is configured, this setting will only be used to process the airline transaction.
+
+Airline dispersions are limited to just 2 parts: one from the main merchant and the other from the airline. It is also possible to carry out a dispersion in which the transaction total value is redirected to the airline, by not sending the merchant dispersion or sending it with total equals to zero.
+
+### Merchant dispersion
+Merchant dispersion allow you to perform a transaction divided into up to 3 sites, including the authenticated one. Child transactions will be processed in the request submitted order.
