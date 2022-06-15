@@ -1860,6 +1860,35 @@
           }
         }
       },
+      "PaymentModifier": {
+        "title": "PaymentModifier",
+        "type": "object",
+        "description": "Structure that contains information about payment modifier",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Modifier type",
+            "enum": [
+              "FEDERAL_GOVERNMENT"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Modifier code. When modifier type is FEDERAL_GOVERNMENT, this value represents law discount.",
+            "example": "17934"
+          },
+          "additional": {
+            "type": "object",
+            "description": "Modifier additional information",
+            "properties": {
+              "invoice": {
+                "type": "string",
+                "description": "Invoice number. Required when type is FEDERAL_GOVERNMENT."
+              }
+            }
+          }
+        }
+      },
       "AmountDetail": {
         "title": "AmountDetail",
         "type": "object",
