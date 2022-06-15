@@ -1802,6 +1802,13 @@
           },
           "Dispersion": {
             "$ref": "#/components/schemas/Dispersion"
+          },
+          "modifiers": {
+            "type": "array",
+            "description": "Structure that contains payment modifiers",
+            "items": {
+              "$ref": "#/components/schemas/PaymentModifier"
+            }
           }
         }
       },
