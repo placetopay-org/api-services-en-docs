@@ -1894,6 +1894,15 @@
               }
             }
           }
+        },
+        "x-examples": {
+          "law-discount": {
+            "type": "FEDERAL_GOVERNMENT",
+            "code": "17934",
+            "additional": {
+              "invoice": "123456"
+            }
+          }
         }
       },
       "AmountDetail": {
