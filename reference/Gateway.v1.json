@@ -155,6 +155,7 @@
                     },
                     "pockets": {
                       "type": "array",
+                      "description": "Structure that contains information about a card pockets.",
                       "items": {
                         "$ref": "#/components/schemas/Pocket"
                       }
@@ -1805,7 +1806,7 @@
       "Pocket": {
         "title": "Pocket",
         "type": "object",
-        "description": "Structure that contains information about card pockets.",
+        "description": "Structure that contains information about a card pocket.",
         "properties": {
           "code": {
             "type": "string",
