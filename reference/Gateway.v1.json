@@ -136,16 +136,22 @@
                       "type": "string"
                     },
                     "requiereOtp": {
-                      "type": "string"
+                      "type": "boolean"
                     },
                     "requiereCvv2": {
-                      "type": "string"
+                      "type": "boolean"
                     },
                     "threeDS": {
                       "type": "string"
                     },
                     "credits": {
                       "$ref": "#/components/schemas/Credit"
+                    },
+                    "requirePockets": {
+                      "type": "boolean"
+                    },
+                    "pocket": {
+                      "type": "string"
                     }
                   }
                 }
@@ -1787,6 +1793,21 @@
           },
           "installment": {
             "type": "integer"
+          }
+        }
+      },
+      "Pocket": {
+        "title": "Pocket",
+        "type": "object",
+        "description": "Structure that contains information about card pockets.",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Pocket value"
+          },
+          "description": {
+            "type": "string",
+            "description": "Pocket label"
           }
         }
       },
