@@ -1870,7 +1870,7 @@
       "PaymentModifier": {
         "title": "PaymentModifier",
         "type": "object",
-        "description": "Structure that contains information about payment modifier",
+        "description": "Structure that contains information about payment modifier.\n\nNOTE: If it is sent a discount modifier, the system will not apply any site promotion discount.",
         "properties": {
           "type": {
             "type": "string",
