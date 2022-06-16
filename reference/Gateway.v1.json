@@ -1715,6 +1715,10 @@
           },
           "otp": {
             "type": "string"
+          },
+          "pocket": {
+            "type": "string",
+            "description": "Card pocket used to pay"
           }
         }
       },
