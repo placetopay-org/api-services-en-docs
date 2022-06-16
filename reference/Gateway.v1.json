@@ -145,13 +145,19 @@
                       "type": "string"
                     },
                     "credits": {
-                      "$ref": "#/components/schemas/Credit"
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Credit"
+                      }
                     },
                     "requirePockets": {
                       "type": "boolean"
                     },
-                    "pocket": {
-                      "type": "string"
+                    "pockets": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Pocket"
+                      }
                     }
                   }
                 }
