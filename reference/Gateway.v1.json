@@ -136,16 +136,29 @@
                       "type": "string"
                     },
                     "requiereOtp": {
-                      "type": "string"
+                      "type": "boolean"
                     },
                     "requiereCvv2": {
-                      "type": "string"
+                      "type": "boolean"
                     },
                     "threeDS": {
                       "type": "string"
                     },
                     "credits": {
-                      "$ref": "#/components/schemas/Credit"
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Credit"
+                      }
+                    },
+                    "requirePockets": {
+                      "type": "boolean"
+                    },
+                    "pockets": {
+                      "type": "array",
+                      "description": "Structure that contains information about a card pockets.",
+                      "items": {
+                        "$ref": "#/components/schemas/Pocket"
+                      }
                     }
                   }
                 }
@@ -1715,6 +1728,10 @@
           },
           "otp": {
             "type": "string"
+          },
+          "pocket": {
+            "type": "string",
+            "description": "Card pocket used to pay"
           }
         }
       },
@@ -1786,6 +1803,21 @@
           }
         }
       },
+      "Pocket": {
+        "title": "Pocket",
+        "type": "object",
+        "description": "Structure that contains information about a card pocket.",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Pocket value"
+          },
+          "description": {
+            "type": "string",
+            "description": "Pocket label"
+          }
+        }
+      },
       "Payment": {
         "title": "Payment",
         "type": "object",
@@ -1802,6 +1834,13 @@
           },
           "Dispersion": {
             "$ref": "#/components/schemas/Dispersion"
+          },
+          "modifiers": {
+            "type": "array",
+            "description": "Structure that contains payment modifiers",
+            "items": {
+              "$ref": "#/components/schemas/PaymentModifier"
+            }
           }
         }
       },
@@ -1857,6 +1896,44 @@
           },
           "base": {
             "type": "number"
+          }
+        }
+      },
+      "PaymentModifier": {
+        "title": "PaymentModifier",
+        "type": "object",
+        "description": "Structure that contains information about payment modifier.\n\nNOTE: If it is sent a discount modifier, the system will not apply any site promotion discount.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Modifier type",
+            "enum": [
+              "FEDERAL_GOVERNMENT"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Modifier code. When modifier type is FEDERAL_GOVERNMENT, this value represents law discount.",
+            "example": "17934"
+          },
+          "additional": {
+            "type": "object",
+            "description": "Modifier additional information",
+            "properties": {
+              "invoice": {
+                "type": "string",
+                "description": "Invoice number. Required when type is FEDERAL_GOVERNMENT."
+              }
+            }
+          }
+        },
+        "x-examples": {
+          "law-discount": {
+            "type": "FEDERAL_GOVERNMENT",
+            "code": "17934",
+            "additional": {
+              "invoice": "123456"
+            }
           }
         }
       },
