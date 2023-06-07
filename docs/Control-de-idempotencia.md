@@ -22,11 +22,11 @@ For example: Client A will pay for Service X. The client already has an account 
 
 The first transaction is done with the IdempotenceKey and the response could be a Approve Transaction or Pending Transaction
 
-![IdempotenceFirst.png](../assets/images/IdempotenceFirst.png)
+![IdempotenceFirst.png](../images/IdempotenceFirst.png)
 
 The transaction is requested again with the same value and the response returns is the same as last time, but with an HTTP Code 208 instead of 200.
 
-![IdempotenceSecond.png](../assets/images/IdempotenceSecond.png)
+![IdempotenceSecond.png](../images/IdempotenceSecond.png)
 
 
 ## Observation
