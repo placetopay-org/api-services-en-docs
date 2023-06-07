@@ -15,6 +15,11 @@
       "title": "API",
       "uri": "reference/Gateway.v1.json"
     },
+    {
+      "type": "item",
+      "title": "Idempotence control",
+      "uri": "docs/Control-de-idempotencia.md"
+    },
      {
       "type": "item",
       "title": "Security",
